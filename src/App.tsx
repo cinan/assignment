@@ -2,14 +2,14 @@ import React from 'react';
 import styled from "styled-components";
 import './loader.css'
 import {useQuery} from "@tanstack/react-query";
-import {ParsedData} from "./types";
+import {ParsedCnbData} from "./types";
+import convert from "./converter";
 
 const MainBox = styled.div`
     display: grid;
     grid-template-columns: 1fr 0.9fr;
-    margin: auto;
     max-width: 600px;
-    margin-top: 40px;
+    margin: 40px auto auto;
 `
 
 const FlexBox = styled.div<{vertical?: boolean; }>`
@@ -23,9 +23,7 @@ const LeftBox = styled(FlexBox)`
     border: 1px solid rgb(211, 198, 251);
     border-radius: 0.5rem;
     box-shadow: rgb(211, 198, 251) 0px 3px 16px -5px;
-    padding: 1rem;
-    padding-top: 2rem;
-    padding-bottom: 2rem;
+    padding: 2rem 1rem;
     overflow: hidden;
 `
 
@@ -116,6 +114,7 @@ const Result = styled.span`
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    line-height: 1.4;
 `
 
 const StyledTable = styled.table`
@@ -131,7 +130,7 @@ const StyledTable = styled.table`
 
     td:first-child {
         width: 40%;
-        padding-left: 1rem;
+        padding-left: 1.5rem;
     }
 
     td:last-child {
@@ -151,29 +150,32 @@ const TableWrapper = styled(FlexBox)`
     padding-bottom: 1rem
 `
 
-const CurrencySelect = () => {
+const CurrencySelect = ({currencyCodes, onSelect}:{currencyCodes: string[], onSelect: (currencyCode: string) => void}) => {
     return (
         <Label>
-            <select>
-                <option value="eur">Eur</option>
+            <select onChange={e => onSelect(e.target.value)}>
+                {currencyCodes.map(code => (
+                    <option key={code} value={code}>{code}</option>
+                ))}
             </select>
         </Label>
     )
 }
 
-const ConverterInputs = () => {
+const ConverterInputs = ({currencyCodes, onCurrencyChange, onInputChange}:{currencyCodes: string[], onInputChange: (input: number) => void, onCurrencyChange: (currencyCode: string) => void }) => {
     return (
         <FlexBox vertical style={{gap: 10, alignItems: 'center'}}>
-            <Input type="number" placeholder="Czk…" />
+            <Input type="number" placeholder="CZK…" onChange={e => onInputChange(+e.target.value)} />
+
             <span style={{ fontSize: '0.8rem' }}>convert into</span>
-            <CurrencySelect />
+            <CurrencySelect currencyCodes={currencyCodes} onSelect={onCurrencyChange} />
         </FlexBox>
     )
 }
 
 
 const useCurrencyRates = () => {
-    const { error, data } = useQuery<any,  any,  ParsedData>({
+    const { error, data } = useQuery<any,  any,  ParsedCnbData>({
         queryKey: ['cnbData'],
         queryFn: () =>
             fetch('http://localhost:3001/cnb').then((res) => res.json()),
@@ -187,34 +189,46 @@ const useCurrencyRates = () => {
     return data
 }
 
+const Converter = ({currencyRates}:{currencyRates: ParsedCnbData}) => {
+    const [targetCode, setTargetCode] = React.useState(currencyRates[0].code)
+    const [input, setInput] = React.useState(0)
+
+    const { rate, amount } = currencyRates.find(({code}) => code === targetCode) || { rate: 0, amount: 0 }
+    const result = (convert(input, { rate, amount }))
+
+    return (
+        <>
+            <ConverterInputs currencyCodes={currencyRates?.map(({code}) => code) || []} onInputChange={setInput} onCurrencyChange={setTargetCode} />
+            <Result>{input} CZK =<br/>{result} {targetCode}</Result>
+        </>
+    )
+}
+
 function App() {
     const currencyRates = useCurrencyRates()
-
-    // input / rate
 
     return (
         <MainBox>
             <LeftBox as="form">
                 <Title style={{ marginBottom: 20 }}>Currency converter</Title>
-                <ConverterInputs />
-                <Result>500 Czk</Result>
+                {currencyRates ? <Converter currencyRates={currencyRates}/> : <span className="loader"/>}
             </LeftBox>
-        <RightBox>
-            <Title scale={-1}>Exchange rates</Title>
+            <RightBox>
+            <Title scale={-1}>CZK Exchange rates</Title>
             {currencyRates ? (
                 <TableWrapper>
                     <StyledTable>
                         <tbody>
-                        {currencyRates.map(({ code, rate }) => (
+                        {currencyRates.map(({ code, amount, rate }) => (
                             <tr key={code}>
                                 <td>{code}</td>
-                                <td>{rate}</td>
+                                <td>{+(rate / amount).toFixed(3)}</td>
                             </tr>
                         ))}
                         </tbody>
                     </StyledTable>
                 </TableWrapper>
-            ) : <span className="loader"></span>}
+            ) : <span className="loader"/>}
         </RightBox>
         </MainBox>
     );

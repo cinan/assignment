@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import axios from 'axios';
 import cors from 'cors';
-import {ParsedData} from "./types";
+import {ParsedCnbData} from "./types";
 
 const app = express();
 const port = 3001;
@@ -10,14 +10,12 @@ app.use(cors());
 
 type Row = `${string}|${string}|${string}|${string}|${string}`
 
-const parseApiData = (data: string): ParsedData => {
+const parseApiData = (data: string): ParsedCnbData => {
     const [,,...rows] = data.split('\n')
 
     const parsed = (rows as Row[]).filter(Boolean).map(row => {
         const [,currency,amount,code,rate] = row.split('|')
-        const rateAmount = (rate as unknown as number) / (amount as unknown as number)
-
-        return { currency, code, rate: +rateAmount.toFixed(3) }
+        return { currency, code, amount: +amount, rate: +rate }
     })
 
     return parsed

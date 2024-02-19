@@ -1,1 +1,1 @@
-export type ParsedData = Array<{ currency: string; code: string, rate: number }>
+export type ParsedCnbData = Array<{ currency: string; code: string, rate: number ;amount: number}>
