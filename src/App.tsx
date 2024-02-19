@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from "styled-components";
 import './loader.css'
+import {useQuery} from "@tanstack/react-query";
+import {ParsedData} from "./types";
 
 const MainBox = styled.div`
     display: grid;
@@ -37,7 +39,7 @@ const RightBox = styled(FlexBox)`
     padding-top: 2rem;
     margin-top: 1rem;
     margin-bottom: 1rem;
-    max-height: 320px;
+    max-height: 310px;
     overflow: hidden;
 `
 
@@ -146,7 +148,7 @@ const StyledTable = styled.table`
 
 const TableWrapper = styled(FlexBox)`
     overflow: auto;
-    padding-bottom: '1rem'
+    padding-bottom: 1rem
 `
 
 const CurrencySelect = () => {
@@ -169,88 +171,50 @@ const ConverterInputs = () => {
     )
 }
 
+
+const useCurrencyRates = () => {
+    const { error, data } = useQuery<any,  any,  ParsedData>({
+        queryKey: ['cnbData'],
+        queryFn: () =>
+            fetch('http://localhost:3001/cnb').then((res) => res.json()),
+    })
+
+    if (error) {
+        console.error(error)
+        return
+    }
+
+    return data
+}
+
 function App() {
+    const currencyRates = useCurrencyRates()
+
+    // input / rate
+
     return (
         <MainBox>
             <LeftBox as="form">
                 <Title style={{ marginBottom: 20 }}>Currency converter</Title>
-                <ConverterInputs/>
+                <ConverterInputs />
                 <Result>500 Czk</Result>
             </LeftBox>
         <RightBox>
             <Title scale={-1}>Exchange rates</Title>
-            {/*<span className="loader"></span>*/}
-            <TableWrapper>
-                <StyledTable>
-                    <tbody>
-                    <tr>
-                        <td>Eur</td>
-                        <td>20</td>
-                    </tr>
-                    <tr>
-                        <td>USD</td>
-                        <td>204</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    <tr>
-                        <td>HUN</td>
-                        <td>28282383.2</td>
-                    </tr>
-                    </tbody>
-                </StyledTable>
-            </TableWrapper>
+            {currencyRates ? (
+                <TableWrapper>
+                    <StyledTable>
+                        <tbody>
+                        {currencyRates.map(({ code, rate }) => (
+                            <tr key={code}>
+                                <td>{code}</td>
+                                <td>{rate}</td>
+                            </tr>
+                        ))}
+                        </tbody>
+                    </StyledTable>
+                </TableWrapper>
+            ) : <span className="loader"></span>}
         </RightBox>
         </MainBox>
     );

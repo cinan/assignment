@@ -3,13 +3,24 @@ import ReactDOM from 'react-dom/client';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {
+    QueryClient,
+    QueryClientProvider,
+} from '@tanstack/react-query'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
+
+const queryClient = new QueryClient()
+
+const Providers = ({ children }: React.PropsWithChildren) =>    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+
 root.render(
   <React.StrictMode>
-    <App />
+    <Providers>
+      <App />
+    </Providers>
   </React.StrictMode>
 );
 
