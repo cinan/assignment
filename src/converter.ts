@@ -1,9 +1,10 @@
 const convert = (
-    input: number, { rate, amount }: { rate: number, amount: number }
+  input: number,
+  { rate, amount }: { rate: number; amount: number },
 ) => {
-    if (!rate || !amount) throw new Error('Invalid exchange rate')
+  if (!rate || !amount) throw new Error("Invalid exchange rate");
 
-    return +(input / (rate / amount)).toFixed(3);
-}
+  return +(input / (rate / amount)).toFixed(3);
+};
 
-export default convert
+export default convert;
