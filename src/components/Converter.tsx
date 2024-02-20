@@ -16,6 +16,7 @@ const StyledInput = styled.input`
   box-shadow: rgba(87, 85, 94, 0.25) 0px 0px 0.1rem 0px;
   font-size: 0.875rem;
   width: 50%;
+  background: white;
 
   &:focus {
     border-color: rgba(153, 148, 168, 0.55);
@@ -55,6 +56,7 @@ const Label = styled.label`
     transition-property: all;
     box-shadow: rgba(87, 85, 94, 0.25) 0px 0px 0.1rem 0px;
     font-size: 0.875rem;
+    background: white;
 
     &:focus {
       border-color: rgba(153, 148, 168, 0.55);
