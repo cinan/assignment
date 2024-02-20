@@ -105,7 +105,14 @@ const Converter = ({ currencyRates }: { currencyRates: ParsedCnbData }) => {
   const { rate, amount } = currencyRates.find(
     ({ code }) => code === targetCode,
   ) || { rate: 0, amount: 0 };
+  // avoid fraction digits if they're not necessary
+  const inputFormatted = "CZK " + new Intl.NumberFormat("en-US").format(input);
+
   const result = convert(input, { rate, amount });
+  const resultFormatted = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: targetCode,
+  }).format(result);
 
   return (
     <>
@@ -123,8 +130,8 @@ const Converter = ({ currencyRates }: { currencyRates: ParsedCnbData }) => {
         />
       </Box>
       <Result>
-        {input} CZK =<br />
-        {result} {targetCode}
+        {inputFormatted} =<br />
+        {resultFormatted}
       </Result>
     </>
   );
