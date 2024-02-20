@@ -3,7 +3,7 @@ import React from "react";
 import convert from "../converter";
 import styled from "styled-components";
 
-const Input = styled.input`
+const StyledInput = styled.input`
   font-family: "Inter", sans-serif;
   padding: 0.33rem 0.66rem;
   border-radius: 2.25rem;
@@ -30,32 +30,6 @@ const Box = styled.div`
   gap: 10px;
   align-items: center;
 `;
-
-const ConverterInputs = ({
-  currencyCodes,
-  onCurrencyChange,
-  onInputChange,
-}: {
-  currencyCodes: string[];
-  onInputChange: (input: number) => void;
-  onCurrencyChange: (currencyCode: string) => void;
-}) => {
-  return (
-    <Box>
-      <Input
-        type="number"
-        placeholder="CZK…"
-        onChange={(e) => onInputChange(+e.target.value)}
-      />
-
-      <span style={{ fontSize: "0.8rem" }}>convert into</span>
-      <CurrencySelect
-        currencyCodes={currencyCodes}
-        onSelect={onCurrencyChange}
-      />
-    </Box>
-  );
-};
 
 const Label = styled.label`
   position: relative;
@@ -133,11 +107,19 @@ const Converter = ({ currencyRates }: { currencyRates: ParsedCnbData }) => {
 
   return (
     <>
-      <ConverterInputs
-        currencyCodes={currencyRates?.map(({ code }) => code) || []}
-        onInputChange={setInput}
-        onCurrencyChange={setTargetCode}
-      />
+      <Box>
+        <StyledInput
+          type="number"
+          placeholder="CZK…"
+          onChange={(e) => setInput(+e.target.value)}
+        />
+
+        <span style={{ fontSize: "0.8rem" }}>convert into</span>
+        <CurrencySelect
+          currencyCodes={currencyRates?.map(({ code }) => code) || []}
+          onSelect={setTargetCode}
+        />
+      </Box>
       <Result>
         {input} CZK =<br />
         {result} {targetCode}

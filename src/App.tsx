@@ -5,14 +5,14 @@ import Converter from "./components/Converter";
 import RatesTable from "./components/RatesTable";
 import useCurrencyRates from "./useCurrencyRates";
 
-const MainBox = styled.div`
+const StyledMainBox = styled.div`
   display: grid;
   grid-template-columns: 1fr 0.9fr;
   max-width: 600px;
   margin: 40px auto auto;
 `;
 
-const LeftBox = styled.div`
+const StyledLeftBox = styled.div`
   display: flex;
   flex-direction: column;
   background-color: rgb(246, 243, 254);
@@ -23,7 +23,7 @@ const LeftBox = styled.div`
   overflow: hidden;
 `;
 
-const RightBox = styled.div`
+const StyledRightBox = styled.div`
   display: flex;
   flex-direction: column;
   border: 1px solid rgb(211, 198, 251);
@@ -38,7 +38,7 @@ const RightBox = styled.div`
   overflow: hidden;
 `;
 
-const Header = styled.h1<{ scale?: number }>`
+const Heading = styled.h1<{ scale?: number }>`
   font-size: ${(props) => (props.scale === -1 ? "1.25rem" : "1.5rem")};
   font-weight: 600;
   font-family: "Epilogue", sans-serif;
@@ -57,17 +57,17 @@ const App = () => {
   const currencyRates = useCurrencyRates();
 
   return (
-    <MainBox>
-      <LeftBox as="form">
-        <Header style={{ marginBottom: 20 }}>Currency converter</Header>
+    <StyledMainBox>
+      <StyledLeftBox as="form">
+        <Heading style={{ marginBottom: 20 }}>Currency converter</Heading>
         {currencyRates ? (
           <Converter currencyRates={currencyRates} />
         ) : (
           <Loader />
         )}
-      </LeftBox>
-      <RightBox>
-        <Header scale={-1}>CZK Exchange rates</Header>
+      </StyledLeftBox>
+      <StyledRightBox>
+        <Heading scale={-1}>CZK Exchange rates</Heading>
         {currencyRates ? (
           <TableWrapper>
             <RatesTable>
@@ -82,8 +82,8 @@ const App = () => {
         ) : (
           <Loader />
         )}
-      </RightBox>
-    </MainBox>
+      </StyledRightBox>
+    </StyledMainBox>
   );
 };
 
