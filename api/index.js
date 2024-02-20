@@ -1,19 +1,16 @@
-import express, { Request, Response } from "express";
-import axios from "axios";
-import cors from "cors";
-import { ParsedCnbData } from "./types";
+const express = require("express");
+const axios = require("axios");
+const cors = require("cors");
 
 const app = express();
 const port = 3001;
 
 app.use(cors());
 
-type Row = `${string}|${string}|${string}|${string}|${string}`;
-
-const parseApiData = (data: string): ParsedCnbData => {
+const parseApiData = (data) => {
   const [, , ...rows] = data.split("\n");
 
-  const parsed = (rows as Row[]).filter(Boolean).map((row) => {
+  const parsed = rows.filter(Boolean).map((row) => {
     const [, currency, amount, code, rate] = row.split("|");
     return { currency, code, amount: +amount, rate: +rate };
   });
@@ -22,7 +19,7 @@ const parseApiData = (data: string): ParsedCnbData => {
 };
 
 // Route to fetch data from the given URL and return the response
-app.get("/cnb", async (req: Request, res: Response) => {
+app.get("/cnb", async (req, res) => {
   try {
     // Fetch data from the URL
     const response = await axios.get(
@@ -44,3 +41,5 @@ app.get("/cnb", async (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+module.exports = app;
