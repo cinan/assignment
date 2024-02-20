@@ -4,7 +4,7 @@ import { ParsedCnbData } from "./types";
 const useCurrencyRates = () => {
   const { error, data } = useQuery<any, any, ParsedCnbData>({
     queryKey: ["cnbData"],
-    queryFn: () => fetch("http://localhost:3001/cnb").then((res) => res.json()),
+    queryFn: () => fetch(`/api/cnb`).then((res) => res.json()),
   });
 
   if (error) {
